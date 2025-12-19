@@ -4,6 +4,20 @@
 
 Vercel is the easiest way to deploy Next.js apps and works perfectly with GitHub.
 
+### ⚠️ IMPORTANT: Before Deploying
+
+**You MUST switch from SQLite to PostgreSQL for production!**
+
+1. **Update Prisma Schema:**
+   - Change line 9 in `prisma/schema.prisma`:
+   ```prisma
+   datasource db {
+     provider = "postgresql"  // Change from "sqlite"
+     url      = env("DATABASE_URL")
+   }
+   ```
+   - Or copy `prisma/schema.postgres.prisma` to `prisma/schema.prisma`
+
 ### Steps:
 
 1. **Push your code to GitHub:**
@@ -16,27 +30,32 @@ Vercel is the easiest way to deploy Next.js apps and works perfectly with GitHub
    git push -u origin main
    ```
 
-2. **Deploy to Vercel:**
+2. **Set Up Database (Choose One):**
+   
+   **A) Vercel Postgres (Easiest):**
+   - In Vercel dashboard → Storage → Create Postgres
+   - Copy connection string
+   
+   **B) External Database:**
+   - [Neon](https://neon.tech) - Free PostgreSQL (Recommended)
+   - [Supabase](https://supabase.com) - Free PostgreSQL
+   - [Railway](https://railway.app) - PostgreSQL
+
+3. **Deploy to Vercel:**
    - Go to [vercel.com](https://vercel.com)
    - Sign up/login with GitHub
    - Click "New Project"
    - Import your GitHub repository
    - Vercel will auto-detect Next.js
-   - Add environment variables:
-     - `DATABASE_URL` - You'll need to use a hosted database (see below)
-     - `NEXTAUTH_SECRET` - Generate a random string
+   - **Add Environment Variables:**
+     - `DATABASE_URL` - Your PostgreSQL connection string
+     - `NEXTAUTH_SECRET` - Generate: `openssl rand -base64 32`
      - `NEXTAUTH_URL` - Your Vercel URL (auto-set)
    - Click "Deploy"
 
-3. **Database Setup:**
-   - For production, use a hosted database:
-     - **Free options:**
-       - [PlanetScale](https://planetscale.com) - MySQL
-       - [Supabase](https://supabase.com) - PostgreSQL
-       - [Railway](https://railway.app) - PostgreSQL
-   - Update `prisma/schema.prisma` to use the new database
-   - Run migrations: `npx prisma db push`
-   - Seed data: `npm run db:seed`
+4. **After First Deployment:**
+   - Run migrations: Use Vercel CLI or create a one-time API route
+   - Seed data: Same as above
 
 ## Option 2: GitHub Pages (Static Export)
 
